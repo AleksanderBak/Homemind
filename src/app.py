@@ -1,6 +1,6 @@
 import streamlit as st
 
-from agent import HomeAgent
+from src.agent import Agent
 
 st.set_page_config(
     page_title="HomeMind",
@@ -22,7 +22,7 @@ st.markdown(
     unsafe_allow_html=True,
 )
 
-agent = HomeAgent()
+llm_agent = Agent()
 
 if "messages" not in st.session_state:
     st.session_state["messages"] = [
@@ -39,7 +39,8 @@ if prompt := st.chat_input():
         {"role": "user", "content": prompt, "avatar": "🧑‍💻"}
     )
     st.chat_message("user", avatar="🧑‍💻").write(prompt)
-    response = agent.get_response(prompt)
+    response = llm_agent.get_response(prompt)
+
     st.session_state.messages.append(
         {"role": "assistant", "content": response, "avatar": "🏠"}
     )
