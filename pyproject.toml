@@ -3,7 +3,7 @@ name = "homemind"
 version = "0.1.0"
 description = ""
 authors =[]
-packages = [{include = "src"}]
+packages = [{include = "homemind"}]
 
 [tool.poetry.dependencies]
 python = "^3.12"

@@ -1,6 +1,6 @@
 import streamlit as st
 
-from src.agent import Agent
+from homemind.agent import Agent
 
 st.set_page_config(
     page_title="HomeMind",
@@ -41,8 +41,8 @@ if prompt := st.chat_input():
     st.chat_message("user", avatar="🧑‍💻").write(prompt)
     response = llm_agent.get_response(prompt)
 
-    st.session_state.messages.append(
-        {"role": "assistant", "content": response, "avatar": "🏠"}
-    )
+    # st.session_state.messages.append(
+    #     {"role": "assistant", "content": response, "avatar": "🏠"}
+    # )
 
-    st.chat_message("assistant", avatar="🏠").write(response)
+    # st.chat_message("assistant", avatar="🏠").write(response)
