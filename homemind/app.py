@@ -8,7 +8,6 @@ st.set_page_config(
     layout="centered",
     initial_sidebar_state="collapsed",
 )
-st.title("🧠 HomeMind")
 
 st.markdown(
     """
