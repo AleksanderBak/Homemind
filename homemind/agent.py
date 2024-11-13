@@ -1,12 +1,19 @@
+import os
 from typing import Annotated
 
-from langchain_core.messages import HumanMessage
-from langchain_core.messages.system import SystemMessage
-from langchain_core.tools import tool
-from langchain_ollama import ChatOllama
+from dotenv import load_dotenv
+from langchain_openai import ChatOpenAI
 from langgraph.graph import END, START, StateGraph
 from langgraph.graph.message import add_messages
 from typing_extensions import TypedDict
+
+load_dotenv()
+API_KEY = os.getenv("OPENAI_KEY")
+
+llm = ChatOpenAI(
+    model="gpt-4o-mini",
+    api_key=API_KEY,
+)
 
 
 class State(TypedDict):
@@ -16,30 +23,23 @@ class State(TypedDict):
 graph_builder = StateGraph(State)
 
 
-@tool
-def get_humid_tool() -> str:
-    """Get the current humidity"""
-    return "The current humidity is 69%"
+def chatbot(state: State):
+    return {"messages": [llm.invoke(state["messages"])]}
 
 
-@tool
-def get_temperature() -> str:
-    """Get the current temperature"""
-    return "The current temperature is 89°C"
+graph_builder.add_node("chatbot", chatbot)
+graph_builder.add_edge(START, "chatbot")
+graph_builder.add_edge("chatbot", END)
+graph = graph_builder.compile()
 
 
 class Agent:
     def __init__(self):
-        tools = [get_humid_tool]
-        self.model = ChatOllama(model="llama3.2").bind_tools(tools)
-        self.messages = [
-            SystemMessage(
-                "You are a cheerfull assistant that wants to help a human with its daily tasks"
-            ),
-        ]
+        self.test = "test"
 
-    def get_response(self, message):
-        self.messages.append(HumanMessage(message))
-        response = self.model.invoke(self.messages)
-        print(response)
-        return response
+    def get_response(self, msg: str) -> str:
+        ret = ""
+        for event in graph.stream({"messages": [("user", msg)]}):
+            for value in event.values():
+                ret += value["messages"][-1].content
+        return ret
