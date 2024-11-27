@@ -1,12 +1,12 @@
 import streamlit as st
 
 from homemind.agent import Agent
+from homemind.utils import to_sync_generator
 
 st.set_page_config(
     page_title="HomeMind",
     page_icon="🧠",
     layout="centered",
-    initial_sidebar_state="collapsed",
 )
 
 st.markdown(
@@ -38,10 +38,11 @@ if prompt := st.chat_input():
         {"role": "user", "content": prompt, "avatar": "🧑‍💻"}
     )
     st.chat_message("user", avatar="🧑‍💻").write(prompt)
-    response = llm_agent.get_response(prompt)
 
-    st.session_state.messages.append(
-        {"role": "assistant", "content": response, "avatar": "🏠"}
+    message = st.chat_message("assistant", avatar="🏠").write_stream(
+        to_sync_generator(llm_agent.get_response(prompt))
     )
 
-    st.chat_message("assistant", avatar="🏠").write(response)
+    st.session_state.messages.append(
+        {"role": "assistant", "content": message, "avatar": "🏠"}
+    )
